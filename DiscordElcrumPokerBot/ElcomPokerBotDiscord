@@ -4,8 +4,14 @@ print ("1#####")
 import discord
 from discord.ext import commands
 
+
+Token = ""
+
+with open("C:\\Users\\FedanDA\\Desktop\\FEDANDA\\My repos\\Scrum Helpers\\Administration\\DiscordBotToken.txt", "r") as file:
+    Token = file.read()
+
 config = {
-    'token': 'MTA2NDc5NjQyMzMxODY4MzY1OA.GLhfbO.M2qJBt0irZVHsBcjjBsQvKcr_7QYEywFxd2uPY',
+    'token': Token,
     'prefix': 'prefix',
 }
 
@@ -38,6 +44,6 @@ async def on_ready( ):
   ##        await ctx.send("Hi")
 
 print("3#####")
-bot.run("MTA2NDc5NjQyMzMxODY4MzY1OA.GLhfbO.M2qJBt0irZVHsBcjjBsQvKcr_7QYEywFxd2uPY")
+bot.run(Token)
 
 
