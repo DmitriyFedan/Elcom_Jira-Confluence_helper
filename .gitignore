@@ -129,3 +129,4 @@ dmypy.json
 .pyre/
 *.xlsx
 Administration/
+.vscode/launch.json
