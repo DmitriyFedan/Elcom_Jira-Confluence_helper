@@ -130,3 +130,9 @@ dmypy.json
 *.xlsx
 Administration/
 .vscode/launch.json
+DiscordElcrumPokerBotDotNet/ElcrumPokerBotDiscord/bin/
+DiscordElcrumPokerBotDotNet/ElcrumPokerBotDiscord/.vs/ElcrumPokerBotDiscord/DesignTimeBuild/.dtbcache.v2
+DiscordElcrumPokerBotDotNet/ElcrumPokerBotDiscord/.vs/ElcrumPokerBotDiscord/v17/.futdcache.v2
+DiscordElcrumPokerBotDotNet/ElcrumPokerBotDiscord/.vs/ElcrumPokerBotDiscord/v17/.suo
+DiscordElcrumPokerBotDotNet/ElcrumPokerBotDiscord/.vs/
+DiscordElcrumPokerBotDotNet/ElcrumPokerBotDiscord/obj/
