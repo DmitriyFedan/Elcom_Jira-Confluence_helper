@@ -52,7 +52,7 @@ namespace ElcrumPokerBotDiscord
                             // *** These creds are given to the proxy server, not the web server ***
                             Credentials = new NetworkCredential(
                                 userName: "fedanda",
-                                password: "5u738mbcyopE4")
+                                password: "+++++++++++")
                     }),
         
             };
@@ -60,6 +60,7 @@ namespace ElcrumPokerBotDiscord
             DiscordSocketClient client = new DiscordSocketClient();   //  or with  config =>   socketConfig
 
             DiscordBotMessageHandler messageHandler = new DiscordBotMessageHandler();
+            ////фыафыафыавфыва
 
 
             client.MessageReceived += messageHandler.MesagesHandler;
@@ -69,9 +70,12 @@ namespace ElcrumPokerBotDiscord
 
             //string path = Directory.GetParent(Directory.GetCurrentDirectory()).ToString();
             //path = String.Concat(path, "\\Administration\\DiscordBotToken.txt");
+            string curentFolder = Environment.CurrentDirectory;
+            string debugFolder = "\\DiscordElcrumPokerBotDotNet\\ElcrumPokerBotDiscord\\bin\\Debug\\net6.0";
+            string administrationFolder = "\\Administration\\DiscordBotToken.txt";
+            string tokenPath = curentFolder.Replace(debugFolder, administrationFolder);
 
-
-            using (StreamReader reader = new StreamReader("G:\\WORKED\\Python\\Elcrum Helpers\\Administration\\DiscordBotToken.txt"))
+            using (StreamReader reader = new StreamReader(tokenPath))
             {
                 token = await reader.ReadToEndAsync();
 
