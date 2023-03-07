@@ -17,6 +17,7 @@ using System.Threading.Tasks;
 using Discord.Net.Rest;
 using Discord.Net.Udp;
 using Discord.Net.WebSockets;
+using Newtonsoft.Json.Linq;
 
 
 namespace ElcrumPokerBotDiscord
@@ -24,52 +25,30 @@ namespace ElcrumPokerBotDiscord
 
     public class Program
     {
-
         static void Main(string[] args)
         => new Program().MainAsync().GetAwaiter().GetResult();
 
-
-        public static class ElcomWebSocketProvider
-        {
-            public static readonly WebSocketProvider Instance = DefaultWebSocketProvider.Create();
-        }
-
         private async Task MainAsync()
         {
-
-            DiscordSocketConfig socketConfig = new DiscordSocketConfig()
+            DiscordSocketConfig config = new DiscordSocketConfig()
             {
-                //https://stackoverflow.com/questions/29856543/httpclient-and-using-proxy-constantly-getting-407
-                //RestClientProvider = DefaultRestClientProvider.Create(true), // или скорее всего придется сделать свой класс типа DefaultRestClient, только чтобы запросы шли через прокси
-                RestClientProvider = ElcomRestClientProvider.Instance,
-                UdpSocketProvider = DefaultUdpSocketProvider.Instance, //тут похоже нужно добавить для Udp прокси, пока хз как это делать
-                WebSocketProvider = DefaultWebSocketProvider.Create(new WebProxy
-                    {
-                            Address = new Uri($"http://192.168.0.10:8080"),
-                            BypassProxyOnLocal = false,
-                            UseDefaultCredentials = false,
-
-                            // *** These creds are given to the proxy server, not the web server ***
-                            Credentials = new NetworkCredential(
-                                userName: "fedanda",
-                                password: "+++++++++++")
-                    }),
-        
+                GatewayIntents = GatewayIntents.All
             };
 
-            DiscordSocketClient client = new DiscordSocketClient();   //  or with  config =>   socketConfig
+            DiscordSocketClient discordClient = new DiscordSocketClient(config);   //  or with  config =>   socketConfig
 
-            DiscordBotMessageHandler messageHandler = new DiscordBotMessageHandler();
-            ////фыафыафыавфыва
+            string token = GetTokenFromFile();
+            await discordClient.LoginAsync(TokenType.Bot, token);
+            await discordClient.StartAsync();
 
+            DiscordBotMessageHandler messageHandler = new DiscordBotMessageHandler(discordClient);
+            await messageHandler.InitializeParticipantsFromDB();
 
-            client.MessageReceived += messageHandler.MesagesHandler;
-            client.Log += messageHandler.Log;
+            Console.ReadLine();
+        }
 
-            string token = "";
-
-            //string path = Directory.GetParent(Directory.GetCurrentDirectory()).ToString();
-            //path = String.Concat(path, "\\Administration\\DiscordBotToken.txt");
+        private string GetTokenFromFile()
+        {
             string curentFolder = Environment.CurrentDirectory;
             string debugFolder = "\\DiscordElcrumPokerBotDotNet\\ElcrumPokerBotDiscord\\bin\\Debug\\net6.0";
             string administrationFolder = "\\Administration\\DiscordBotToken.txt";
@@ -77,24 +56,9 @@ namespace ElcrumPokerBotDiscord
 
             using (StreamReader reader = new StreamReader(tokenPath))
             {
-                token = await reader.ReadToEndAsync();
-
+                string token = reader.ReadToEnd();
+                return token;
             }
-
-            await client.LoginAsync(TokenType.Bot, token);
-            await client.StartAsync();
-
-            Console.ReadLine();
-        }
-
-
-
-        
-        
-
-        private Task CommandHadler()
-        {
-            return Task.CompletedTask;
         }
     }
 
