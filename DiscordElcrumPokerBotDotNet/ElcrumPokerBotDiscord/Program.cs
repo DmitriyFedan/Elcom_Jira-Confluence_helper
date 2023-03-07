@@ -57,14 +57,11 @@ namespace ElcrumPokerBotDiscord
         
             };
 
-            DiscordSocketClient client = new DiscordSocketClient();   //  or with  config =>   socketConfig
+            DiscordSocketClient discordClient = new DiscordSocketClient();   //  or with  config =>   socketConfig
 
-            DiscordBotMessageHandler messageHandler = new DiscordBotMessageHandler();
+            DiscordBotMessageHandler messageHandler = new DiscordBotMessageHandler(discordClient);
             ////фыафыафыавфыва
 
-
-            client.MessageReceived += messageHandler.MesagesHandler;
-            client.Log += messageHandler.Log;
 
             string token = "";
 
@@ -81,8 +78,8 @@ namespace ElcrumPokerBotDiscord
 
             }
 
-            await client.LoginAsync(TokenType.Bot, token);
-            await client.StartAsync();
+            await discordClient.LoginAsync(TokenType.Bot, token);
+            await discordClient.StartAsync();
 
             Console.ReadLine();
         }

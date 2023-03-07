@@ -1,18 +1,16 @@
 ﻿using Discord;
 using Discord.WebSocket;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Cryptography.X509Certificates;
-using System.Text;
-using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 
 namespace ElcrumPokerBotDiscord
 {
     public class DiscordBotMessageHandler
     {
+        // fields 
+        private DiscordSocketClient _discordClient;
 
-
+        // properties
         private Dictionary<string, int> Estimates { get; }
 
         List<string> Administrators { get; }
@@ -22,20 +20,25 @@ namespace ElcrumPokerBotDiscord
 
         //private ParticipantsCollection Participants = new ParticipantsCollection();
 
-        List<SocketUser> Participants { get; }
+        List<SocketUser> DiscordClients { get; }
 
-        public DiscordBotMessageHandler()
+        public DiscordBotMessageHandler(DiscordSocketClient discordClient)
         {
+            _discordClient = discordClient;
+
             Estimates = new Dictionary<string, int>();
-
-            Participants = new List<SocketUser> { };
-
+            DiscordClients = new List<SocketUser> { };
             Administrators = new List<string>()
             {
                 "Dmitriy_Fedan",
                 "Uglickih Viacheslav",
                 "Chjen Nikita"
             };
+
+            InitializeParticipantsFromDB();
+
+            discordClient.MessageReceived += MesagesHandler;
+            discordClient.Log += Log;
         }
 
         public Task Log(LogMessage msg)
@@ -55,19 +58,39 @@ namespace ElcrumPokerBotDiscord
             {
                 return Task.CompletedTask;
             }
-            //if (!Administrators.Contains(msg.Author.Username.ToString()) ||
-            //    !AvailableClients.Contains(msg.Author.Username.ToString()))
-            //{
-            //    return Task.CompletedTask;
-            //}
+           
+
             string userName = msg.Author.Username.ToString();
             ISocketMessageChannel messageChanel = msg.Channel;
             SocketUser author = msg.Author;
+            
             switch (msg.Content)
             {
                 
                 case "/hello": //  подтверждаем участие или добавляем нового участника (вынести в отдельный метод)
                     CheckOrAddParticipant(msg.Author);
+                    //Participant User = new Participant((int)msg.Author.Id, msg.Author.Username.ToString(), messageChanel);
+                    //Participant participant = new Participant((int)msg.Author.Id, msg.Author.Username, msg.Channel.Id);
+                    //using (AppContext db = new AppContext())
+                    //{
+                    //    db.Users.Add(participant);
+                    //    db.SaveChanges();
+
+                        
+                    //}
+                    
+                    // var channel = client.GetUser(msg.Author.Id);
+                    //var channel = client.GetChannel(participant.Channel);
+                    //channel.SendMessageAsync("123");
+                    
+
+                    break;
+
+                case "/test":
+                    //if (PartisipantsContains( )
+                   
+
+                    
 
                     break;
 
@@ -84,7 +107,7 @@ namespace ElcrumPokerBotDiscord
 
                 case "/clearAll": // todo  добавитьпроверку на  наличие прав на данное действие               
                     SendMessageToAllParticipants($"{msg.Author.Username}, очистил список разрешенных пользователей и оценок");
-                    Participants.Clear();
+                    DiscordClients.Clear();
                     Estimates.Clear();
 
                     break;
@@ -92,7 +115,7 @@ namespace ElcrumPokerBotDiscord
                 default:
                     if (TryHandledEstimate(msg.Content, userName))
                     {
-                        if (Participants.Count == Estimates.Count)
+                        if (DiscordClients.Count == Estimates.Count)
                         {
                             SendResultToAllParticipants();
                         }
@@ -132,7 +155,8 @@ namespace ElcrumPokerBotDiscord
             }
             else
             {
-                Participants.Add(user);
+                DiscordClients.Add(user);
+
                 user.SendMessageAsync(($" {userName}, добро пожаловать в новое Scrum Poker голосование"));
             }
         }
@@ -141,7 +165,7 @@ namespace ElcrumPokerBotDiscord
         {
             bool contains = false;
 
-            foreach (var participant in Participants)
+            foreach (var participant in DiscordClients)
             {
                 if (participant.Username.Equals(userName))
                 {
@@ -154,7 +178,7 @@ namespace ElcrumPokerBotDiscord
 
         private void SendMessageToAllParticipants(string message)
         {
-            foreach (var participant in Participants)
+            foreach (var participant in DiscordClients)
             { 
                 participant.SendMessageAsync(message);
             }
@@ -187,13 +211,27 @@ namespace ElcrumPokerBotDiscord
                 return true;
 
             }
-
-            else
-            {
-                return false;
-            }
-
+            
+            return false;
         }
 
+        
+        private void InitializeParticipantsFromDB()
+        {
+            DiscordClients.Clear();
+
+            using (AppContext db = new AppContext())
+            {
+                var dbParticipants = db.Users.ToList();
+                foreach(var participant in dbParticipants)
+                {
+                    var sockentClient = _discordClient.GetUser(participant.Id);
+                    if (sockentClient != null)
+                    {
+                        DiscordClients.Add(sockentClient);
+                    }  
+                }
+            } 
+        }
     }
 }
