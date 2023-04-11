@@ -1,28 +1,12 @@
-﻿using System.Threading.Tasks;
-using Discord;
-using Discord.Commands;
+﻿using Discord;
 using Discord.WebSocket;
-using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.IO;
-using System.Linq;
-using System.Net;
-using System.Net.Http;
-using System.Net.Http.Headers;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using Discord.Net.Rest;
-using Discord.Net.Udp;
 using Discord.Net.WebSockets;
-using Newtonsoft.Json.Linq;
 
+using System.Net;
 
 namespace ElcrumPokerBotDiscord
 {
-
     public class Program
     {
         static void Main(string[] args)
@@ -30,9 +14,13 @@ namespace ElcrumPokerBotDiscord
 
         private async Task MainAsync()
         {
+            var proxyAdres = new Uri("http://192.168.36.253:5454");
+            WebProxy elcomProxy = new WebProxy(proxyAdres, false, null);
             DiscordSocketConfig config = new DiscordSocketConfig()
             {
-                GatewayIntents = GatewayIntents.All
+                GatewayIntents = GatewayIntents.All,
+                RestClientProvider = DefaultRestClientProvider.Create(true),
+                WebSocketProvider = DefaultWebSocketProvider.Create(elcomProxy)
             };
 
             DiscordSocketClient discordClient = new DiscordSocketClient(config);   //  or with  config =>   socketConfig
