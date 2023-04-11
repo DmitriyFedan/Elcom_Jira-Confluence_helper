@@ -1,9 +1,7 @@
 ﻿using Discord;
-using Discord.Commands;
 using Discord.WebSocket;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Identity.Client;
+using ElcrumPokerBotDiscord.Models;
+
 
 namespace ElcrumPokerBotDiscord
 {
@@ -15,13 +13,6 @@ namespace ElcrumPokerBotDiscord
         // properties
         private Dictionary<string, int> Estimates { get; }
 
-        List<string> Administrators { get; }
-
-        List<string> AvailableClients { get; }
-
-
-        //private ParticipantsCollection Participants = new ParticipantsCollection();
-
         List<SocketUser> DiscordParticipants { get; }
 
         public DiscordBotMessageHandler(DiscordSocketClient discordClient)
@@ -30,15 +21,7 @@ namespace ElcrumPokerBotDiscord
 
             Estimates = new Dictionary<string, int>();
             DiscordParticipants = new List<SocketUser> { };
-            Administrators = new List<string>()
-            {
-                "Dmitriy_Fedan",
-                "Uglickih Viacheslav",
-                "Chjen Nikita"
-            };
-
-            
-
+         
             discordClient.MessageReceived += MesagesHandler;
             discordClient.Log += Log;
         }
@@ -49,11 +32,6 @@ namespace ElcrumPokerBotDiscord
             return Task.CompletedTask;
         }
 
-
-        //TODO  вынести логику отппавки сообщений в отдельный метод, а лучше класс  
-
-        //todo  класс рассыльщик, должен отправлять сообщения как одному пользователю так и делать массовую рассылку,
-        //возможно читать  участников из БД, 
         public Task MesagesHandler(SocketMessage msg)
         {
             if (msg.Author.IsBot)

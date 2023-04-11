@@ -3,12 +3,19 @@ using Discord.WebSocket;
 using Discord.Net.Rest;
 using Discord.Net.WebSockets;
 
+
 using System.Net;
+
+using Newtonsoft.Json.Linq;
+using System.Reflection;
+using Discord.Commands;
 
 namespace ElcrumPokerBotDiscord
 {
     public class Program
     {
+        public DiscordSocketClient _discordClient;
+        public CommandService _commandService;
         static void Main(string[] args)
         => new Program().MainAsync().GetAwaiter().GetResult();
 
@@ -23,17 +30,24 @@ namespace ElcrumPokerBotDiscord
                 WebSocketProvider = DefaultWebSocketProvider.Create(elcomProxy)
             };
 
-            DiscordSocketClient discordClient = new DiscordSocketClient(config);   //  or with  config =>   socketConfig
-
             string token = GetTokenFromFile();
-            await discordClient.LoginAsync(TokenType.Bot, token);
-            await discordClient.StartAsync();
 
-            DiscordBotMessageHandler messageHandler = new DiscordBotMessageHandler(discordClient);
-            await messageHandler.InitializeParticipantsFromDB();
+            _discordClient = new DiscordSocketClient(config);   //  or with  config =>   socketConfig
+            _commandService = new CommandService();
 
-            Console.ReadLine();
+            
+            CommandHandler commandHandler = new CommandHandler(_discordClient, _commandService);
+            await commandHandler.InstallCommands();
+            
+            // DiscordBotMessageHandler messageHandler = new DiscordBotMessageHandler(discordClient);
+            //await messageHandler.InitializeParticipantsFromDB();
+
+            await _discordClient.LoginAsync(TokenType.Bot, token);
+            await _discordClient.StartAsync();
+
+            await Task.Delay(-1);
         }
+
 
         private string GetTokenFromFile()
         {

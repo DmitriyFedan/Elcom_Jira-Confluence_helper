@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Discord;
 using Discord.WebSocket;
+using ElcrumPokerBotDiscord.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace ElcrumPokerBotDiscord

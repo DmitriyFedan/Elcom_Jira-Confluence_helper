@@ -1,17 +1,12 @@
 ﻿using Discord.WebSocket;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace ElcrumPokerBotDiscord
+namespace ElcrumPokerBotDiscord.Models
 {
     public class Participant
     {
         public ulong Id { get; set; }
         public string UserName { get; set; }
-        
+
         public Participant(SocketUser socketUser)
         {
             Id = socketUser.Id;
