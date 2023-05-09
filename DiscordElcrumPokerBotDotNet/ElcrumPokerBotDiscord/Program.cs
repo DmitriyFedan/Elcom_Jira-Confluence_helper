@@ -26,24 +26,25 @@ namespace ElcrumPokerBotDiscord
             DiscordSocketConfig config = new DiscordSocketConfig()
             {
                 GatewayIntents = GatewayIntents.All,
-                RestClientProvider = DefaultRestClientProvider.Create(true),
-                WebSocketProvider = DefaultWebSocketProvider.Create(elcomProxy)
+                //RestClientProvider = DefaultRestClientProvider.Create(true),
+                //WebSocketProvider = DefaultWebSocketProvider.Create(elcomProxy)
             };
 
             string token = GetTokenFromFile();
 
             _discordClient = new DiscordSocketClient(config);   //  or with  config =>   socketConfig
-            _commandService = new CommandService();
+            //_commandService = new CommandService();
 
             
-            CommandHandler commandHandler = new CommandHandler(_discordClient, _commandService);
-            await commandHandler.InstallCommands();
+            //CommandHandler commandHandler = new CommandHandler(_discordClient, _commandService);
+            //await commandHandler.InstallCommands();
             
-            // DiscordBotMessageHandler messageHandler = new DiscordBotMessageHandler(discordClient);
-            //await messageHandler.InitializeParticipantsFromDB();
+            DiscordBotMessageHandler messageHandler = new DiscordBotMessageHandler(_discordClient);
+           
 
             await _discordClient.LoginAsync(TokenType.Bot, token);
             await _discordClient.StartAsync();
+            //await messageHandler.InitializeParticipantsFromDB();
 
             await Task.Delay(-1);
         }

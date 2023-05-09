@@ -4,11 +4,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using ElcrumPokerBotDiscord.Models;
 
-namespace ElcrumPokerBotDiscord
+namespace ElcrumPokerBotDiscord.Models
 {
-    public class ParticipantsCollection : IEnumerable<Participant> 
+    public class ParticipantsCollection : IEnumerable<Participant>
     {
         public List<Participant> ParticipantsList { get; set; }
 
@@ -23,10 +22,10 @@ namespace ElcrumPokerBotDiscord
             bool result = false;
             foreach (var item in ParticipantsList)
             {
-                 if (item.UserName.Equals(userName))
-                 {
+                if (item.UserName.Equals(userName))
+                {
                     result = true;
-                 }
+                }
             }
             return result;
         }
@@ -47,6 +46,6 @@ namespace ElcrumPokerBotDiscord
             throw new NotImplementedException();
         }
 
-       
+
     }
 }

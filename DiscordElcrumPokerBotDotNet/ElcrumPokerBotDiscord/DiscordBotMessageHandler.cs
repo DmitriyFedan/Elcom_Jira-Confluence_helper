@@ -1,7 +1,8 @@
-﻿using Discord;
+﻿using Azure.Identity;
+using Discord;
 using Discord.WebSocket;
 using ElcrumPokerBotDiscord.Models;
-
+using System.Net.WebSockets;
 
 namespace ElcrumPokerBotDiscord
 {
@@ -24,6 +25,7 @@ namespace ElcrumPokerBotDiscord
          
             discordClient.MessageReceived += MesagesHandler;
             discordClient.Log += Log;
+            discordClient.ButtonExecuted += ButtonHandler;
         }
 
         public Task Log(LogMessage msg)
@@ -39,12 +41,7 @@ namespace ElcrumPokerBotDiscord
                 return Task.CompletedTask;
             }
 
-
-            string userName = msg.Author.Username.ToString();
-            ISocketMessageChannel messageChanel = msg.Channel;
-            SocketUser author = msg.Author;
-
-
+           
             switch (msg.Content)
             {
 
@@ -77,18 +74,39 @@ namespace ElcrumPokerBotDiscord
 
                     break;
 
+                case "/test":
+
+                    var builder = new ComponentBuilder();
+                    builder.WithButton("Принять", "accept", ButtonStyle.Success, row: 1);
+                    builder.WithButton("Отклонить", "reject", ButtonStyle.Danger, row: 2);
+                    builder.WithButton("Принять", "accept", ButtonStyle.Success, row: 3);
+                    builder.WithButton("Отклонить", "reject", ButtonStyle.Danger, row: 4);
+                    msg.Author.SendMessageAsync("mesage", components : builder.Build());
+                    
+                    break;
+
+                case "/newvote":
+
+                    //var vote = new VoteFectory();
+
+
                 default:
-                    if (TryHandledEstimate(msg.Content, userName))
-                    {
-                        if (DiscordParticipants.Count == Estimates.Count)
-                        {
-                            SendResultToAllParticipants();
-                        }
-                    }
-                    else
-                    {
-                        msg.Author.SendMessageAsync("не удалось распознать");
-                    }
+                    
+
+                    var user = _discordClient.GetUser(ulong.Parse(msg.Content));
+
+
+                    //if (TryHandledEstimate(msg.Content, userName))
+                    //{
+                    //    if (DiscordParticipants.Count == Estimates.Count)
+                    //    {
+                    //        SendResultToAllParticipants();
+                    //    }
+                    //}
+                    //else
+                    //{
+                    //    msg.Author.SendMessageAsync("не удалось распознать");
+                    //}
 
                     break;
             }
@@ -172,9 +190,7 @@ namespace ElcrumPokerBotDiscord
             SendMessageToAllParticipants($"Средняя оценка - {result} \n" + ResultMessage);
         }
 
-        private bool
-            TryHandledEstimate(string msgText,
-                string userName) // добавить провероку на наличие данного юзера в голосовании 
+        private bool TryHandledEstimate(string msgText, string userName) // добавить провероку на наличие данного юзера в голосовании 
         {
             if (int.TryParse(msgText, out int vote))
             {
@@ -200,7 +216,7 @@ namespace ElcrumPokerBotDiscord
                     //var socketClient = _discordClient.GetUser(participant.Id);
                     var socketClient =  await GetUserByIdAsync(participant.Id); //_discordClient.GetUser(participant.Id);
                     //var socketChanel = _discordClient.GetChannel(participant.Id);       
-                    if (socketClient != null)
+                    if (socketClient != null && !!socketClient.IsBot)
                     {
                         DiscordParticipants.Add(socketClient);
                     }
@@ -232,6 +248,21 @@ namespace ElcrumPokerBotDiscord
                 
                 db.Users.Add(participant);
                 db.SaveChanges();
+            }
+        }
+
+        private async Task ButtonHandler(SocketMessageComponent component)
+        {
+            switch (component.Data.CustomId)
+            {
+                case "accept":
+                    CheckOrAddParticipant(component.User);
+
+                    break;
+
+                case "reject":
+                    //TODO implement this logic
+                    break;
             }
         }
     }
