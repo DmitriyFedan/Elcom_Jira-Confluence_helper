@@ -22,7 +22,7 @@ namespace ElcrumPokerBotDiscord
 
             Estimates = new Dictionary<string, int>();
             DiscordParticipants = new List<SocketUser> { };
-         
+
             discordClient.MessageReceived += MesagesHandler;
             discordClient.Log += Log;
             discordClient.ButtonExecuted += ButtonHandler;
@@ -41,7 +41,27 @@ namespace ElcrumPokerBotDiscord
                 return Task.CompletedTask;
             }
 
-           
+            if (msg.Content.Contains("/add_"))
+            {
+                string invitedUser = msg.Content.Replace("/add_", "");
+
+                string userName = invitedUser.Split('#')[0];
+                string descriminator = invitedUser.Split('#')[1];
+
+
+                if (!string.IsNullOrEmpty(userName) && !string.IsNullOrEmpty(descriminator))
+                {
+                    var invitedDiscordUser = _discordClient.GetUser(userName, descriminator);
+
+                    if (invitedDiscordUser != null)
+                    {
+                        SendInviteTo(msg.Author, invitedDiscordUser);
+                    }
+
+                }
+                return Task.CompletedTask;
+            }
+
             switch (msg.Content)
             {
 
@@ -51,7 +71,7 @@ namespace ElcrumPokerBotDiscord
                     break;
 
                 case "/initdb":
-                    InitializeParticipantsFromDB();              
+                    InitializeParticipantsFromDB();
 
                     break;
 
@@ -74,42 +94,43 @@ namespace ElcrumPokerBotDiscord
 
                     break;
 
+
                 case "/test":
 
                     var builder = new ComponentBuilder();
-                    builder.WithButton("Принять", "accept", ButtonStyle.Success, row: 1);
-                    builder.WithButton("Отклонить", "reject", ButtonStyle.Danger, row: 2);
-                    builder.WithButton("Принять", "accept", ButtonStyle.Success, row: 3);
-                    builder.WithButton("Отклонить", "reject", ButtonStyle.Danger, row: 4);
-                    msg.Author.SendMessageAsync("mesage", components : builder.Build());
-                    
+                    builder.WithButton("Принять", "accept", ButtonStyle.Success);
+                    builder.WithButton("Отклонить", "reject", ButtonStyle.Danger);
+
+                    msg.Author.SendMessageAsync("mesage", components: builder.Build());
+
                     break;
 
                 case "/newvote":
 
-                    //var vote = new VoteFectory();
+                //var vote = new VoteFectory();
 
 
                 default:
-                    
-
-                    var user = _discordClient.GetUser(ulong.Parse(msg.Content));
 
 
-                    //if (TryHandledEstimate(msg.Content, userName))
-                    //{
-                    //    if (DiscordParticipants.Count == Estimates.Count)
-                    //    {
-                    //        SendResultToAllParticipants();
-                    //    }
-                    //}
-                    //else
-                    //{
-                    //    msg.Author.SendMessageAsync("не удалось распознать");
-                    //}
+                    //var user = _discordClient.GetUser(ulong.Parse(msg.Content));
+
+                    if (TryHandledEstimate(msg.Content, msg.Author.Username.ToString()))
+                    {
+                        if (DiscordParticipants.Count == Estimates.Count)
+                        {
+                            SendResultToAllParticipants();
+                        }
+                    }
+                    else
+                    {
+                        msg.Author.SendMessageAsync("не удалось распознать");
+                    }
 
                     break;
             }
+
+
 
             return Task.CompletedTask;
         }
@@ -162,6 +183,17 @@ namespace ElcrumPokerBotDiscord
 
             return contains;
         }
+
+        private void SendInviteTo(SocketUser voteCreator, SocketUser invitedSocketUser)
+        {
+            var builder = new ComponentBuilder();
+            builder.WithButton("Принять", "accept", ButtonStyle.Success, row: 0);
+            builder.WithButton("Отклонить", "reject", ButtonStyle.Danger, row: 0);
+
+            invitedSocketUser.SendMessageAsync($"{voteCreator.Username.ToString()} предлагает вам принять участие в голосовании", components: builder.Build());
+            
+            
+        } 
 
         private void SendMessageToAllParticipants(string message)
         {
@@ -256,7 +288,9 @@ namespace ElcrumPokerBotDiscord
             switch (component.Data.CustomId)
             {
                 case "accept":
+                  
                     CheckOrAddParticipant(component.User);
+
 
                     break;
 

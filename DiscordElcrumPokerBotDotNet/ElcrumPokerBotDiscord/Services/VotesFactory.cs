@@ -26,7 +26,7 @@ namespace ElcrumPokerBotDiscord.Services
                 return Task.CompletedTask;
             }
 
-            switch (msg.Content)
+            //switch (msg.Content);
 
             return Task.CompletedTask;
         }
