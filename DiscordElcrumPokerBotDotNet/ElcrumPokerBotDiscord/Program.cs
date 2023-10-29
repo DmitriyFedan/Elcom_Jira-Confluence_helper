@@ -16,6 +16,7 @@ namespace ElcrumPokerBotDiscord
     {
         public DiscordSocketClient _discordClient;
         public CommandService _commandService;
+
         static void Main(string[] args)
         => new Program().MainAsync().GetAwaiter().GetResult();
 

@@ -2,6 +2,7 @@
 using Discord;
 using Discord.WebSocket;
 using ElcrumPokerBotDiscord.Models;
+using Microsoft.IdentityModel.Tokens;
 using System.Net.WebSockets;
 
 namespace ElcrumPokerBotDiscord
@@ -34,6 +35,23 @@ namespace ElcrumPokerBotDiscord
             return Task.CompletedTask;
         }
 
+        /// <summary>
+        /// 
+        /// /add_123456789123456      invite  user  by id 
+        ///  /initdb
+        ///  
+        /// 
+        ///  /hello
+        ///  /clearAll
+        ///  /result
+        ///  /new
+        ///  
+        ///  
+        /// </summary>
+        /// <param name="msg"></param>
+        /// <returns></returns>
+
+
         public Task MesagesHandler(SocketMessage msg)
         {
             if (msg.Author.IsBot)
@@ -45,20 +63,33 @@ namespace ElcrumPokerBotDiscord
             {
                 string invitedUser = msg.Content.Replace("/add_", "");
 
-                string userName = invitedUser.Split('#')[0];
-                string descriminator = invitedUser.Split('#')[1];
 
 
-                if (!string.IsNullOrEmpty(userName) && !string.IsNullOrEmpty(descriminator))
+                if (!string.IsNullOrEmpty(invitedUser) && ulong.TryParse(invitedUser, out ulong invitedUserId ))
                 {
-                    var invitedDiscordUser = _discordClient.GetUser(userName, descriminator);
+                    
+                    var invitedDiscordUser = _discordClient.GetUser(invitedUserId);
 
                     if (invitedDiscordUser != null)
                     {
                         SendInviteTo(msg.Author, invitedDiscordUser);
                     }
-
                 }
+
+                //string userName = invitedUser.Split('#')[0];
+                //string descriminator = invitedUser.Split('#')[1];
+
+
+                //if (!string.IsNullOrEmpty(userName) && !string.IsNullOrEmpty(descriminator))
+                //{
+                //    var invitedDiscordUser = _discordClient.GetUser(userName, descriminator);
+
+                //    if (invitedDiscordUser != null)
+                //    {
+                //        SendInviteTo(msg.Author, invitedDiscordUser);
+                //    }
+
+                //}
                 return Task.CompletedTask;
             }
 
