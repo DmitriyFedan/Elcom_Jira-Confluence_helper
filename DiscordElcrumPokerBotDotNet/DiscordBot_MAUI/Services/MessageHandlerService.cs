@@ -16,6 +16,8 @@ namespace ElcrumPokerBotDiscord
 
         public List<SocketUser> DiscordParticipants { get; }
 
+        public event EventHandler UpdateParticipantsEvent;
+
         public MessageHandlerService(IDiscordClientService discordClientService)
         {
             _discordClient = discordClientService.DiscordClient;
@@ -120,6 +122,7 @@ namespace ElcrumPokerBotDiscord
                     SendMessageToAllParticipants(
                         $"{msg.Author.Username}, очистил список разрешенных пользователей и оценок");
                     DiscordParticipants.Clear();
+                    UpdateParticipantsEvent.Invoke(this, EventArgs.Empty);
                     Estimates.Clear();
 
                     break;
@@ -192,9 +195,11 @@ namespace ElcrumPokerBotDiscord
                 DiscordParticipants.Add(socketUser);
 
                 //WriteParticipantToDB(socketUser);
-
+               
                 socketUser.SendMessageAsync(
                     ($" {socketUser.Username}, добро пожаловать в новое Scrum Poker голосование"));
+
+                UpdateParticipantsEvent.Invoke(this, EventArgs.Empty);
             }
         }
 

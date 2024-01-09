@@ -46,31 +46,35 @@ namespace MauiDiscordBot.ViewModels
             _messageHandlerService = new MessageHandlerService(discordClientSeervice);
             Participants = new ObservableCollection<Participant>();
 
-
-            foreach (var socketUser in _messageHandlerService.DiscordParticipants)
-            {
-                Participants.Add(new Participant(socketUser));
-            }
-
-
-
+            _messageHandlerService.UpdateParticipantsEvent += OnUpdateParticipantsList;
             Name = "Elcrum Poker Bot";
-
-            AddUser = new Command(AddUserAction);
+            AddUser = new Command(UpdateParticipantsAction);
         }
 
-
-        
 
         public void OnPropertyChanged([CallerMemberName] string propertyName = "") 
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        public void AddUserAction()
+        public void UpdateParticipantsAction()
         {
-            Participants.Add(new Participant());
+            OnUpdateParticipantsList(this, EventArgs.Empty);
         }
+        private void OnUpdateParticipantsList(object sender, EventArgs e)
+        {
+            
+            Application.Current.Dispatcher.DispatchAsync((Action)(() =>
+            {
+                Participants.Clear();
+                foreach (var socketUser in _messageHandlerService.DiscordParticipants)
+                {
+                    Participants.Add(new Participant(socketUser));
+                }
+            }));
+        }
+            
+        
 
     }
 }

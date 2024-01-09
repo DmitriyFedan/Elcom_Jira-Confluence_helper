@@ -1,11 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="DiscordBot_MAUI.MainPage"
-            >
+             x:Class="DiscordBot_MAUI.MainPage">
 
     <ScrollView>
-        <VerticalStackLayout
+        <VerticalStackLayout 
             Spacing="20"
             Padding="20"
             VerticalOptions="Center">
@@ -17,8 +16,22 @@
                 FontSize="32"
                 HorizontalOptions="Center" />
 
+            
+            <VerticalStackLayout HorizontalOptions="Center">
+                <Label Text="/add_123456789123456   invite  user  by id " />
+                <Label Text="/hello - participate voting" />
+                <Label Text="/new - start new votting" />
+                <Label Text="/result - get current voting result" />
+                <Label Text="/clearAll -  clear all voting participants" />
+                
+            </VerticalStackLayout>
+            
+
+
+
+
             <Label
-                Text="Welcome to .NET Multi-platform App UI"
+                Text="List of voting participants "
                 SemanticProperties.HeadingLevel="Level2"
                 SemanticProperties.Description="Welcome to dot net Multi platform App U I"
                 FontSize="18"
@@ -32,6 +45,7 @@
                         <ViewCell>
                             <HorizontalStackLayout HorizontalOptions="Center">
                                 <Label Text="{Binding UserName}" />
+                                <Label Text=" " />
                                 <Label Text="{Binding Id}" />
                             </HorizontalStackLayout>
                         </ViewCell>
@@ -41,7 +55,7 @@
 
             <Button
                 x:Name="CounterBtn"
-                Text="Click me"
+                Text="Update List"
                 SemanticProperties.Hint="Counts the number of times you click"
                 Command="{Binding AddUser}"
                 HorizontalOptions="Center" />
